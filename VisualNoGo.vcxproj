@@ -128,7 +128,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="NoGo.h" />
-    <ClInclude Include="Visuable.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="NoGoMain.cpp" />
