@@ -5,12 +5,12 @@
 
 #define BOARD_SIZE 9
 
-//格子的状态
+
 #define BLACK       0x1
 #define WHITE       0x2
 #define BLANK       0x4
 
-//对局的状态
+
 #define BLACK_WIN   0x1
 #define WHITE_WIN   0x2
 #define GAME_ON     0x4
