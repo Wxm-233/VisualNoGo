@@ -1,3 +1,3 @@
-# VisuableNoGo
+# VisualNoGo
 
 These are the source codes and essential files for the NoGo game.

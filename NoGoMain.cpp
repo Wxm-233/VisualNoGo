@@ -1,7 +1,7 @@
 #include <graphics.h>
 #include <mmsystem.h>
 #include "NoGo.h"
-#include "Visuable.h"
+#include "Visual.h"
 
 #pragma comment(lib, "Winmm.lib")
 
