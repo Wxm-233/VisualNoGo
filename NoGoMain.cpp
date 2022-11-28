@@ -2,6 +2,7 @@
 #include <mmsystem.h>
 #include "NoGo.h"
 #include "Visual.h"
+#include "MCTS.h"
 
 #pragma comment(lib, "Winmm.lib")
 
