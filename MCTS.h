@@ -76,9 +76,24 @@ void Expansion(Node *node, int* addressofN, signed char** Board)
     }
 }
 
-int RollOut(Node *node)
+void RollOut(Node *node, signed char** Board, int currentRound, signed int color)
 {
-    int value;
+    signed char** BoardCopy = noGo_Initialize();
+    for(signed char i = 0; i < BOARD_SIZE; i++)
+        for(signed char j = 0; j < BOARD_SIZE; j++)
+            BoardCopy[i][j] = Board[i][j];
     
-    return value;
+    signed int result = GAME_ON;
+    do{
+        POINT rdmpt = randomPoint();
+        if(currentRound % 2)
+            result = board_Process(rdmpt.x, rdmpt.y, BoardCopy, BLACK);
+        else result = board_Process(rdmpt.x, rdmpt.y, BoardCopy, WHITE);
+    }while (result == GAME_ON);
+
+    if(result == color)
+        node->value = 2;
+    else node->value = 1;
+
+    free_Board(BoardCopy);
 }
