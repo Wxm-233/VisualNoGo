@@ -46,10 +46,10 @@ Node* Selection(Node *node, int N)
 {
     int maxUCB = 0;
     int maxValueOne = 0;
-    for(int i = 0; i < node->childNode.size(); i++)
+    for (int i = 0; i < node->childNode.size(); i++)
     {
         int currentUCB = UCB(N, node->childNode[i]->n, node->childNode[i]->value);
-        if(currentUCB > maxUCB)
+        if (currentUCB > maxUCB)
         {
             maxUCB = currentUCB;
             maxValueOne = i;
@@ -60,17 +60,18 @@ Node* Selection(Node *node, int N)
 
 void Expansion(Node *node, int* addressofN, signed char** Board)
 {
-    for(signed char i = 0; i < BOARD_SIZE; i++)
+    for (signed char i = 0; i < BOARD_SIZE; i++)
     {
-        for(signed char j = 0; j < BOARD_SIZE; j++)
+        for (signed char j = 0; j < BOARD_SIZE; j++)
         {
-            if(Board[i][j] == BLANK)
+            if (Board[i][j] == BLANK)
             {
                 Node* newNode = new(sizeof(Node));
                 newNode->n = 0;
                 newNode->value = 0;
                 node->childNode.push(newNode);
                 (node->n)++;
+                (*addressofN)++;
             }
         }
     }
@@ -79,21 +80,47 @@ void Expansion(Node *node, int* addressofN, signed char** Board)
 void RollOut(Node *node, signed char** Board, int currentRound, signed int color)
 {
     signed char** BoardCopy = noGo_Initialize();
-    for(signed char i = 0; i < BOARD_SIZE; i++)
-        for(signed char j = 0; j < BOARD_SIZE; j++)
+    for (signed char i = 0; i < BOARD_SIZE; i++)
+        for (signed char j = 0; j < BOARD_SIZE; j++)
             BoardCopy[i][j] = Board[i][j];
     
     signed int result = GAME_ON;
     do{
         POINT rdmpt = randomPoint();
-        if(currentRound % 2)
+        if (currentRound % 2)
             result = board_Process(rdmpt.x, rdmpt.y, BoardCopy, BLACK);
         else result = board_Process(rdmpt.x, rdmpt.y, BoardCopy, WHITE);
     }while (result == GAME_ON);
 
-    if(result == color)
+    if (result == color)
         node->value = 2;
     else node->value = 1;
 
     free_Board(BoardCopy);
+}
+
+POINT MCTS_AI(signed char** Board, int currentRound, signed char color)
+{
+    Node* MainNode = new(sizeof(Node));
+    MainNode->n = 0;
+    MainNode->value = 0;
+    Node* CurrentNode = MainNode;
+    int N = 0;
+    for(int i = 0; i < 100; i++)
+    {
+        if (CurrentNode->childNode.empty())
+        {
+            if (CurrentNode->n == 0)
+            {
+                RollOut(CurrentNode, Board, currentRound, color);
+            }
+            else {
+                Expansion(CurrentNode, &N, Board);
+                CurrentNode = CurrentNode->childNode[0];
+            }
+        }
+        else {
+            CurrentNode = Selection(CurrentNode, N);
+        }
+    }
 }
