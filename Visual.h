@@ -29,11 +29,17 @@
 #define BACK_TO_HOMEPAGE	4
 
 
-int CurrentChosen = 0;
+int CurrentChosen = 1;
 int mouseLocation = OUTSIDE;
 int currentInterface = HOMEPAGE;
 int currentRound = 0;
 int GameResult = GAME_ON;
+int SelectedMode = PVP_MODE;
+int PlayerSelected = BLACK_PIECE;
+
+HWND MainWnd = initgraph(MAIN_WND_WIDTH, MAIN_WND_HEIGHT);
+signed char** Board = noGo_Initialize();
+bool doGameRestart = false;
 
 POINT dropPosition;
 
@@ -317,4 +323,77 @@ void LoadImages()
 
 	loadimage(&img_Black_Small,						TEXT("./Pictures/Black_Small.jpg"));
 	loadimage(&img_White_Small,						TEXT("./Pictures/White_Small.jpg"));
+}
+
+bool PlayerOperation(HWND MainWnd, signed char** Board)
+{
+	if (currentRound == 1 && dropPosition.x == BOARD_SIZE / 2 && dropPosition.y == BOARD_SIZE / 2)
+	{
+		MessageBox(MainWnd, TEXT("Not here!"), TEXT("Warning"), MB_OK);
+		return false;
+	}
+
+	if (Board[dropPosition.x][dropPosition.y] == BLANK) {
+		currentRound++;
+		putimage(rct_Board.left + dropPosition.x * SIZE_OF_A_CELL - SIZE_OF_PIECE_PIC, rct_Board.top + dropPosition.y * SIZE_OF_A_CELL - SIZE_OF_PIECE_PIC, &img_Under, SRCAND);
+
+		if (!(currentRound % 2))
+		{
+			Board[dropPosition.x][dropPosition.y] = BLACK_PIECE;
+			putimage(rct_Board.left + dropPosition.x * SIZE_OF_A_CELL - SIZE_OF_PIECE_PIC, rct_Board.top + dropPosition.y * SIZE_OF_A_CELL - SIZE_OF_PIECE_PIC, &img_Black, SRCPAINT);
+			putimage(rct_indicator.left, rct_indicator.top, &img_White_Small, SRCCOPY);
+			GameResult = board_Process(dropPosition.x, dropPosition.y, Board, BLACK_PIECE);
+		}
+
+		else {
+			Board[dropPosition.x][dropPosition.y] = WHITE_PIECE;
+			putimage(rct_Board.left + dropPosition.x * SIZE_OF_A_CELL - SIZE_OF_PIECE_PIC, rct_Board.top + dropPosition.y * SIZE_OF_A_CELL - SIZE_OF_PIECE_PIC, &img_White, SRCPAINT);
+			putimage(rct_indicator.left, rct_indicator.top, &img_Black_Small, SRCCOPY);
+			GameResult = board_Process(dropPosition.x, dropPosition.y, Board, WHITE_PIECE);
+		}
+
+		return true;
+	}
+
+	return false;
+}
+
+void AIOperation(HWND MainWnd, signed char** Board, POINT AI_Chosen)
+{
+		currentRound++;
+		putimage(rct_Board.left + AI_Chosen.x * SIZE_OF_A_CELL - SIZE_OF_PIECE_PIC, rct_Board.top + AI_Chosen.y * SIZE_OF_A_CELL - SIZE_OF_PIECE_PIC, &img_Under, SRCAND);
+
+		if (!(currentRound % 2))
+		{
+			Board[AI_Chosen.x][AI_Chosen.y] = BLACK_PIECE;
+			putimage(rct_Board.left + AI_Chosen.x * SIZE_OF_A_CELL - SIZE_OF_PIECE_PIC, rct_Board.top + AI_Chosen.y * SIZE_OF_A_CELL - SIZE_OF_PIECE_PIC, &img_Black, SRCPAINT);
+			putimage(rct_indicator.left, rct_indicator.top, &img_White_Small, SRCCOPY);
+			GameResult = board_Process(AI_Chosen.x, AI_Chosen.y, Board, BLACK_PIECE);
+		}
+
+		else {
+			Board[AI_Chosen.x][AI_Chosen.y] = WHITE_PIECE;
+			putimage(rct_Board.left + AI_Chosen.x * SIZE_OF_A_CELL - SIZE_OF_PIECE_PIC, rct_Board.top + AI_Chosen.y * SIZE_OF_A_CELL - SIZE_OF_PIECE_PIC, &img_White, SRCPAINT);
+			putimage(rct_indicator.left, rct_indicator.top, &img_Black_Small, SRCCOPY);
+			GameResult = board_Process(AI_Chosen.x, AI_Chosen.y, Board, WHITE_PIECE);
+		}
+}
+
+void GameJudge()
+{
+	switch (GameResult)
+	{
+	case WHITE_WIN:
+		MessageBox(MainWnd, TEXT("White wins!"), TEXT("Game end"), MB_OK);
+		clear_Board(Board);
+		doGameRestart = true;
+		break;
+	case BLACK_WIN:
+		MessageBox(MainWnd, TEXT("Black wins!"), TEXT("Game end"), MB_OK);
+		clear_Board(Board);
+		doGameRestart = true;
+		break;
+
+	default: break;
+	}
 }

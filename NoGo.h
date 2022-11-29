@@ -6,17 +6,17 @@
 #define BOARD_SIZE 9
 
 
-#define BLACK       0x1
-#define WHITE       0x2
-#define BLANK       0x4
+#define BLACK_PIECE         0x1
+#define WHITE_PIECE         0x2
+#define BLANK               0x4
 
 
 #define BLACK_WIN   0x1
 #define WHITE_WIN   0x2
 #define GAME_ON     0x4
 #define UNDEFINED   0x8
-//BLACK_WIN == BLACK
-//WHITE_WIN == WHITE
+//BLACK_WIN == BLACK_PIECE
+//WHITE_WIN == WHITE_PIECE
 
 signed char**   noGo_Initialize();
 void            free_Board(signed char** Board);
@@ -24,6 +24,9 @@ void            clear_Board(signed char** Board);
 signed char     opposite_Color(signed char color);
 signed char     board_Process(signed char x, signed char y, signed char** Board, signed char color);
 bool            qi_Search(signed char x, signed char y, signed char** Board, unsigned int* searchMap, signed char color);
+signed char**   Board_Copy(signed char** Board);
+signed char     Round2Color(int round);
+signed char     Check_Board(signed char x, signed char y, signed char** Board, signed char color);
 
 signed char** noGo_Initialize()
 {
@@ -61,17 +64,24 @@ signed char opposite_Color(signed char color)
 {
     switch (color)
     {
-    case BLACK:return WHITE;
-    case WHITE:return BLACK;
+    case BLACK_PIECE:return WHITE_PIECE;
+    case WHITE_PIECE:return BLACK_PIECE;
     default: return UNDEFINED;
     }
 }
 
+signed char Check_Board(signed char x, signed char y, signed char** Board, signed char color)
+{
+    signed int result = board_Process(x, y, Board, color);
+    Board[x][y] = BLANK;
+    return result;
+}
+
 signed char board_Process(signed char x, signed char y, signed char** Board, signed char color)
 {
-    unsigned int* searchMap = (unsigned int*)malloc(BOARD_SIZE * sizeof(unsigned int));
-
     Board[x][y] = color;
+
+    unsigned int* searchMap = (unsigned int*)malloc(BOARD_SIZE * sizeof(unsigned int));
 
     memset(searchMap, 0, BOARD_SIZE * sizeof(unsigned int));
     if (!qi_Search(x, y, Board, searchMap, color))                                                                                           return opposite_Color(color);//OPPOSITE_COLOR_WIN
@@ -115,4 +125,24 @@ bool qi_Search(signed char x, signed char y, signed char** Board, unsigned int* 
     qi += qi_Search(x, y + 1, Board, searchMap, color);
 
     return qi;
+}
+
+signed char** Board_Copy(signed char** Board)
+{
+    signed char** Copy = noGo_Initialize();
+    for (int i = 0; i < BOARD_SIZE; i++)
+    {
+        for (int j = 0; j < BOARD_SIZE; j++)
+        {
+            Copy[i][j] = Board[i][j];
+        }
+    }
+    return Copy;
+}
+
+signed char Round2Color(int round)
+{
+    if (round % 2)
+        return BLACK_PIECE;
+    else return WHITE_PIECE;
 }

@@ -10,10 +10,6 @@ ExMessage m;
 
 int main()
 {
-	HWND MainWnd = initgraph(MAIN_WND_WIDTH, MAIN_WND_HEIGHT);
-	signed char** Board = noGo_Initialize();
-	bool doGameRestart = false;
-
 	LoadImages();
 
 	//check if the board is succesfully initialized
@@ -169,15 +165,23 @@ case MODE_SELECT:
 					{
 					case PVP_MODE:
 						currentInterface = GAME_INTERFACE;
+						SelectedMode = PVP_MODE;
 						PlaySound(TEXT(".\\Music\\jialunyibo.wav"), NULL, SND_LOOP | SND_ASYNC);
 						break;
 
 					case PVC_MODE:
-						MessageBox(MainWnd, TEXT("Coming Soon..."), TEXT("Sorry"), MB_OK);
+						currentInterface = GAME_INTERFACE;
+						SelectedMode = PVC_MODE;
+						if (MessageBox(MainWnd, TEXT("Would you like to use Black Piece?"), TEXT("Reminder"), MB_YESNO) == IDYES)
+							PlayerSelected = BLACK_PIECE;
+						else PlayerSelected = WHITE_PIECE;
+						PlaySound(TEXT(".\\Music\\jialunyibo.wav"), NULL, SND_LOOP | SND_ASYNC);
 						break;
 
 					case CVC_MODE:
-						MessageBox(MainWnd, TEXT("Coming Soon..."), TEXT("Sorry"), MB_OK);
+						currentInterface = GAME_INTERFACE;
+						SelectedMode = CVC_MODE;
+						PlaySound(TEXT(".\\Music\\jialunyibo.wav"), NULL, SND_LOOP | SND_ASYNC);
 						break;
 					}
 					break;
@@ -205,14 +209,23 @@ case MODE_SELECT:
 						{
 						case PVP_MODE:
 							currentInterface = GAME_INTERFACE;
+							SelectedMode = PVP_MODE;
+							PlaySound(TEXT(".\\Music\\jialunyibo.wav"), NULL, SND_LOOP | SND_ASYNC);
 							break;
 
 						case PVC_MODE:
-							MessageBox(MainWnd, TEXT("Coming Soon..."), TEXT("Sorry"), MB_OK);
+							currentInterface = GAME_INTERFACE;
+							SelectedMode = PVC_MODE;
+							if (MessageBox(MainWnd, TEXT("Would you like to use Black Piece?"), TEXT("Reminder"), MB_YESNO) == IDYES)
+								PlayerSelected = BLACK_PIECE;
+							else PlayerSelected = WHITE_PIECE;
+							PlaySound(TEXT(".\\Music\\jialunyibo.wav"), NULL, SND_LOOP | SND_ASYNC);
 							break;
 
 						case CVC_MODE:
-							MessageBox(MainWnd, TEXT("Coming Soon..."), TEXT("Sorry"), MB_OK);
+							currentInterface = GAME_INTERFACE;
+							SelectedMode = CVC_MODE;
+							PlaySound(TEXT(".\\Music\\jialunyibo.wav"), NULL, SND_LOOP | SND_ASYNC);
 							break;
 						}
 					}
@@ -234,7 +247,10 @@ case GAME_INTERFACE:
 			putimage(rct_indicator.left, rct_indicator.top, &img_Black_Small, SRCCOPY);
 
 			CurrentChosen = NOBUTTON;
-			currentRound = 0;
+			currentRound = 1;
+			if (PlayerSelected == WHITE_PIECE && SelectedMode == PVC_MODE)
+				AIOperation(MainWnd, Board, MCTS_AI(Board, currentRound));
+
 			doGameRestart = false;
 
 			while (true)
@@ -261,59 +277,46 @@ case GAME_INTERFACE:
 					switch (mouseLocation)
 					{
 					case ON_BOARD:
-						
+						switch (SelectedMode)
 						{
+						case PVP_MODE:
 							dropPosition = pixel2board(m.x, m.y);
+							PlayerOperation(MainWnd, Board);
 
-							if (!currentRound && dropPosition.x == BOARD_SIZE / 2 && dropPosition.y == BOARD_SIZE / 2)
+							break;
+
+						case PVC_MODE:
+							if (Round2Color(currentRound) == PlayerSelected)
 							{
-								MessageBox(MainWnd, TEXT("Not here!"), TEXT("Warning"), MB_OK);
-								break;
-							}
-
-							if (Board[dropPosition.x][dropPosition.y] == BLANK) {
-								currentRound++;
-								putimage(rct_Board.left + dropPosition.x * SIZE_OF_A_CELL - SIZE_OF_PIECE_PIC, rct_Board.top + dropPosition.y * SIZE_OF_A_CELL - SIZE_OF_PIECE_PIC, &img_Under, SRCAND);
-
-								if (currentRound % 2)
+								dropPosition = pixel2board(m.x, m.y);
+								if (PlayerOperation(MainWnd, Board))
 								{
-									Board[dropPosition.x][dropPosition.y] = BLACK;
-									putimage(rct_Board.left + dropPosition.x * SIZE_OF_A_CELL - SIZE_OF_PIECE_PIC, rct_Board.top + dropPosition.y * SIZE_OF_A_CELL - SIZE_OF_PIECE_PIC, &img_Black, SRCPAINT);
-									putimage(rct_indicator.left, rct_indicator.top, &img_White_Small, SRCCOPY);
-									GameResult = board_Process(dropPosition.x, dropPosition.y, Board, BLACK);
+									GameJudge();
+									AIOperation(MainWnd, Board, MCTS_AI(Board, currentRound));
 								}
-
-								else {
-									Board[dropPosition.x][dropPosition.y] = WHITE;
-									putimage(rct_Board.left + dropPosition.x * SIZE_OF_A_CELL - SIZE_OF_PIECE_PIC, rct_Board.top + dropPosition.y * SIZE_OF_A_CELL - SIZE_OF_PIECE_PIC, &img_White, SRCPAINT);
-									putimage(rct_indicator.left, rct_indicator.top, &img_Black_Small, SRCCOPY);
-									GameResult = board_Process(dropPosition.x, dropPosition.y, Board, WHITE);
-								}
-
-								switch (GameResult)
-								{
-								case WHITE_WIN:
-									MessageBox(MainWnd, TEXT("White wins!"), TEXT("Game end"), MB_OK);
-									clear_Board(Board);
-									doGameRestart = true;
-									break;
-								case BLACK_WIN:
-									MessageBox(MainWnd, TEXT("Black wins!"), TEXT("Game end"), MB_OK);
-									clear_Board(Board);
-									doGameRestart = true;
-									break;
-								}
-
-
 							}
+							else MessageBox(MainWnd, TEXT("Not your Round!"), TEXT("Waring"), MB_OK);
+							break;
+
+						case CVC_MODE:
+
+							break;
+
+						default: break;
 						}
+						
+						GameJudge();
+
 						break;
 
+
+
 					case RESET:
-					if(currentRound) {
-						clear_Board(Board);
-						doGameRestart = true;
-					}
+						if (currentRound != 1)
+						{
+							clear_Board(Board);
+							doGameRestart = true;
+						}
 
 						break;
 
@@ -325,21 +328,28 @@ case GAME_INTERFACE:
 						}
 
 						break;
+
+					default: break;
+
+						break;
 					}
-
-					break;
-
 				case WM_KEYDOWN:
 					switch (m.vkcode)
 					{
 					case VK_ESCAPE:
 						if (MessageBox(MainWnd, TEXT("Back to HomePage?"), TEXT("Warning"), MB_YESNO) == IDYES)
+						{
+							clear_Board(Board);
 							currentInterface = HOMEPAGE;
+						}
 
 						break;
+
+					default: break;
 					}
 
 					break;
+					
 				}
 				if (doGameRestart)
 					break;
