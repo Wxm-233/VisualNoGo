@@ -176,7 +176,7 @@ void deleteNode(Node* node)
 
 POINT MCTS_AI(signed char** Board, int currentRound)
 {
-    if (currentRound < 20)
+    if (currentRound < 2)
     {
         POINT rdmpt = randomPoint(Board, Round2Color(currentRound));
         if (rdmpt.x != -1)
