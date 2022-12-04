@@ -379,7 +379,7 @@ void AIOperation(HWND MainWnd, signed char** Board, POINT AI_Chosen)
 		}
 }
 
-void GameJudge()
+signed int GameJudge()
 {
 	switch (GameResult)
 	{
@@ -387,13 +387,15 @@ void GameJudge()
 		MessageBox(MainWnd, TEXT("White wins!"), TEXT("Game end"), MB_OK);
 		clear_Board(Board);
 		doGameRestart = true;
-		break;
+		return WHITE_WIN;
+
 	case BLACK_WIN:
 		MessageBox(MainWnd, TEXT("Black wins!"), TEXT("Game end"), MB_OK);
 		clear_Board(Board);
 		doGameRestart = true;
-		break;
+		return BLACK_WIN;
 
-	default: break;
+	default: 
+		return GAME_ON;
 	}
 }

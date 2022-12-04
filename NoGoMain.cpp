@@ -291,8 +291,11 @@ case GAME_INTERFACE:
 								dropPosition = pixel2board(m.x, m.y);
 								if (PlayerOperation(MainWnd, Board))
 								{
-									GameJudge();
-									AIOperation(MainWnd, Board, MCTS_AI(Board, currentRound));
+									if (GameJudge() == GAME_ON)
+									{
+										AIOperation(MainWnd, Board, MCTS_AI(Board, currentRound));
+										GameJudge();
+									}
 								}
 							}
 							else MessageBox(MainWnd, TEXT("Not your Round!"), TEXT("Waring"), MB_OK);
@@ -305,11 +308,16 @@ case GAME_INTERFACE:
 						default: break;
 						}
 						
-						GameJudge();
 
 						break;
 
-
+					case NEXT:
+						if (SelectedMode == CVC_MODE)
+						{
+							AIOperation(MainWnd, Board, MCTS_AI(Board, currentRound));
+							GameJudge();
+						}
+						break;
 
 					case RESET:
 						if (currentRound != 1)

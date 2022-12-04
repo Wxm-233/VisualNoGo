@@ -82,22 +82,45 @@ signed char board_Process(signed char x, signed char y, signed char** Board, sig
     Board[x][y] = color;
 
     unsigned int* searchMap = (unsigned int*)malloc(BOARD_SIZE * sizeof(unsigned int));
+    if (searchMap == NULL)
+        return GAME_ON;
 
-    memset(searchMap, 0, BOARD_SIZE * sizeof(unsigned int));
-    if (!qi_Search(x, y, Board, searchMap, color))                                                                                           return opposite_Color(color);//OPPOSITE_COLOR_WIN
+    memset(searchMap, false, BOARD_SIZE * sizeof(unsigned int));
+    if (!qi_Search(x, y, Board, searchMap, color))
+    {
+        //free(searchMap);
+        return opposite_Color(color);//OPPOSITE_COLOR_WIN
+    }
 
-    memset(searchMap, 0, BOARD_SIZE * sizeof(unsigned int));
-    if (x - 1 >= 0 && Board[x - 1][y] == opposite_Color(color) && !qi_Search(x - 1, y, Board, searchMap, opposite_Color(color)))          return opposite_Color(color);
+    memset(searchMap, false, BOARD_SIZE * sizeof(unsigned int));
+    if (x - 1 >= 0 && Board[x - 1][y] == opposite_Color(color) && !qi_Search(x - 1, y, Board, searchMap, opposite_Color(color)))          
+    {
+        //free(searchMap);
+        return opposite_Color(color);
+    }
 
-    memset(searchMap, 0, BOARD_SIZE * sizeof(unsigned int));
-    if (x + 1 < BOARD_SIZE && Board[x + 1][y] == opposite_Color(color) && !qi_Search(x + 1, y, Board, searchMap, opposite_Color(color)))          return opposite_Color(color);
+    memset(searchMap, false, BOARD_SIZE * sizeof(unsigned int));
+    if (x + 1 < BOARD_SIZE && Board[x + 1][y] == opposite_Color(color) && !qi_Search(x + 1, y, Board, searchMap, opposite_Color(color)))          
+    {
+        //free(searchMap);
+        return opposite_Color(color);
+    }
 
-    memset(searchMap, 0, BOARD_SIZE * sizeof(unsigned int));
-    if (y - 1 >= 0 && Board[x][y - 1] == opposite_Color(color) && !qi_Search(x, y - 1, Board, searchMap, opposite_Color(color)))          return opposite_Color(color);
+    memset(searchMap, false , BOARD_SIZE * sizeof(unsigned int));
+    if (y - 1 >= 0 && Board[x][y - 1] == opposite_Color(color) && !qi_Search(x, y - 1, Board, searchMap, opposite_Color(color)))          
+    {
+        //free(searchMap);
+        return opposite_Color(color);
+    }
 
-    memset(searchMap, 0, BOARD_SIZE * sizeof(unsigned int));
-    if (y + 1 < BOARD_SIZE && Board[x][y + 1] == opposite_Color(color) && !qi_Search(x, y + 1, Board, searchMap, opposite_Color(color)))          return opposite_Color(color);
+    memset(searchMap, false, BOARD_SIZE * sizeof(unsigned int));
+    if (y + 1 < BOARD_SIZE && Board[x][y + 1] == opposite_Color(color) && !qi_Search(x, y + 1, Board, searchMap, opposite_Color(color)))          
+    {
+        //free(searchMap);
+        return opposite_Color(color);
+    }
 
+    //free(searchMap);
     return GAME_ON;
 }
 
