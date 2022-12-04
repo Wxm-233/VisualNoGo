@@ -302,7 +302,7 @@ case GAME_INTERFACE:
 							break;
 
 						case CVC_MODE:
-
+							//TBA
 							break;
 
 						default: break;
@@ -338,9 +338,8 @@ case GAME_INTERFACE:
 						break;
 
 					default: break;
-
-						break;
 					}
+					break;
 				case WM_KEYDOWN:
 					switch (m.vkcode)
 					{
