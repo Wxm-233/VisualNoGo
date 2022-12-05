@@ -40,13 +40,14 @@ POINT randomPoint(signed char** Board, int currentRound)
 
 double UCB(int N, int n, int v)
 {
-    return (double)v / (n + 0.0001) + 2 * sqrt(log(N + 1) / (n + 0.01));
+    return (double)v / (n + 0.01) + 2 * sqrt(log(N + 1) / (n + 0.0001));
 }
 
 Node* Selection(Node* node, int N)
 {
-    double maxUCB = -1e12;
+    
     int maxUCBOne = rand() % node->childNode.size();
+    double maxUCB = UCB(N, node->childNode[maxUCBOne]->n, node->childNode[maxUCBOne]->value);
     for (int i = 0; i < node->childNode.size(); i++)
     {
         double currentUCB = UCB(N, node->childNode[i]->n, (node->childNode[i]->value));
@@ -96,7 +97,8 @@ void RollOut(Node* node, signed char** Board, int currentRound, signed int color
         else node->value = 2;
     }
 
-    for (int i = 0; i < 50; i++) {
+    for (int i = 0; i < 10; i++) 
+    {
         signed char** BoardCopy = Board_Copy(Board);
 
         signed int result = GAME_ON;
@@ -118,6 +120,7 @@ void RollOut(Node* node, signed char** Board, int currentRound, signed int color
         for (int i = 0; i < node->childNode.size(); i++)
             delete node->childNode[i];
 
+        node->childNode.shrink_to_fit();
         node->childNode.clear();
         Expansion(node, Board, currentRound, color);
     }
@@ -176,7 +179,7 @@ void deleteNode(Node* node)
 
 POINT MCTS_AI(signed char** Board, int currentRound)
 {
-    if (currentRound < 2)
+    if (currentRound < 40)
     {
         POINT rdmpt = randomPoint(Board, Round2Color(currentRound));
         if (rdmpt.x != -1)
@@ -187,7 +190,7 @@ POINT MCTS_AI(signed char** Board, int currentRound)
     int N = 0;
     signed int color = Round2Color(currentRound);
     Expansion(MainNode, Board, currentRound, color);
-    for (int i = 0; i < 20; i++)
+    for (int i = 0; i < 80; i++)
     {
         Node_Process(Board, currentRound, color, MainNode, &N);
     }

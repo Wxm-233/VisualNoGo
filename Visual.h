@@ -35,7 +35,7 @@ int currentInterface = HOMEPAGE;
 int currentRound = 0;
 int GameResult = GAME_ON;
 int SelectedMode = PVP_MODE;
-int PlayerSelected = BLACK_PIECE;
+signed char PlayerSelected = BLACK_PIECE;
 
 HWND MainWnd = initgraph(MAIN_WND_WIDTH, MAIN_WND_HEIGHT);
 signed char** Board = noGo_Initialize();

@@ -282,7 +282,7 @@ case GAME_INTERFACE:
 						case PVP_MODE:
 							dropPosition = pixel2board(m.x, m.y);
 							PlayerOperation(MainWnd, Board);
-
+							GameJudge();
 							break;
 
 						case PVC_MODE:

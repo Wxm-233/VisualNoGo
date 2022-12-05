@@ -6,15 +6,15 @@
 #define BOARD_SIZE 9
 
 
-#define BLACK_PIECE         0x1
-#define WHITE_PIECE         0x2
-#define BLANK               0x4
+#define BLACK_PIECE         'B'
+#define WHITE_PIECE         'W'
+#define BLANK               '~'
 
 
-#define BLACK_WIN   0x1
-#define WHITE_WIN   0x2
-#define GAME_ON     0x4
-#define UNDEFINED   0x8
+#define BLACK_WIN   'B'
+#define WHITE_WIN   'W'
+#define GAME_ON     '~'
+#define UNDEFINED   NULL
 //BLACK_WIN == BLACK_PIECE
 //WHITE_WIN == WHITE_PIECE
 
@@ -34,14 +34,14 @@ signed char** noGo_Initialize()
     if (Board == NULL)
         return NULL;
 
-    for (int i = 0; i < BOARD_SIZE; i++)
-    {
-        Board[i] = (signed char*)malloc(BOARD_SIZE * sizeof(signed char));
-        if (Board[i] == NULL)
-            return NULL;
+    signed char* Area = (signed char*)malloc(BOARD_SIZE * BOARD_SIZE * sizeof(signed char));
+    if (Area == NULL)
+        return NULL;
 
-        memset(Board[i], BLANK, BOARD_SIZE * sizeof(signed char));
-    }
+    memset(Area, BLANK, BOARD_SIZE * BOARD_SIZE * sizeof(signed char));
+
+    for (int i = 0; i < BOARD_SIZE; i++)
+        Board[i] = Area + i * BOARD_SIZE;
 
     return Board;
 }
