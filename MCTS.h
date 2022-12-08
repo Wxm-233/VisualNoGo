@@ -74,11 +74,7 @@ void Expansion(Node* node, signed char** Board, int currentRound, signed int col
                 signed int result = Check_Board(i, j, Board, Round2Color(currentRound));
                 if (result == color)
                 {
-                    newNode->value += 2;
-                }
-                else if (result == opposite_Color(color))
-                {
-                    newNode->value -= -2;
+                    newNode->value += 1;
                 }
 
                 node->childNode.push_back(newNode);
@@ -87,34 +83,34 @@ void Expansion(Node* node, signed char** Board, int currentRound, signed int col
     }
 }
 
-void RollOut(Node* node, signed char** Board, int currentRound, signed int color)
+void RollOut(Node* node, signed char** Board, int currentRound, signed char color)
 {
     Expansion(node, Board, currentRound, color);
     if (node->childNode.empty())
     {
-        if (Round2Color(currentRound) == color)
-            node->value = -2;
-        else node->value = 2;
+        if (Round2Color(currentRound) != color)
+            node->value = 1;
+        return;
     }
 
-    for (int i = 0; i < 10; i++) 
+    for (int i = 0; i < 100; i++) 
     {
         signed char** BoardCopy = Board_Copy(Board);
 
-        signed int result = GAME_ON;
+        signed char result = GAME_ON;
+        int thisRound = currentRound;
         do {
-            int thisRound = currentRound;
             int ChosenOrder = rand() % node->childNode.size();
             POINT ChosenPoint = node->childNode[ChosenOrder]->Point;
             delete node->childNode[ChosenOrder];
             node->childNode.erase(node->childNode.begin() + ChosenOrder);
 
-            result = board_Process(ChosenPoint.x, ChosenPoint.y, BoardCopy, Round2Color(thisRound++));
+            result = board_Process(ChosenPoint.x, ChosenPoint.y, BoardCopy, Round2Color(thisRound));
+            thisRound++;
         } while (result == GAME_ON);
 
         if (result == color)
-            node->value += 2;
-        else node->value -= 2;
+            node->value += 1;
 
         free_Board(BoardCopy);
         for (int i = 0; i < node->childNode.size(); i++)
@@ -179,7 +175,7 @@ void deleteNode(Node* node)
 
 POINT MCTS_AI(signed char** Board, int currentRound)
 {
-    if (currentRound < 40)
+    if (currentRound < 5)
     {
         POINT rdmpt = randomPoint(Board, Round2Color(currentRound));
         if (rdmpt.x != -1)
@@ -195,19 +191,26 @@ POINT MCTS_AI(signed char** Board, int currentRound)
         Node_Process(Board, currentRound, color, MainNode, &N);
     }
 
-    int maxValue = -0x7FFFFFF;
-    int maxValuePos = 0;
-    for (int i = 0; i < MainNode->childNode.size(); i++)
+    for (int i = MainNode->childNode.size() - 1; i > 0; i--)
     {
-        int currentValue = MainNode->childNode[i]->value;
-        if (currentValue > maxValue)
+        for (int j = 0; j < i; j++)
         {
-            maxValue = currentValue;
-            maxValuePos = i;
+            if (MainNode->childNode[j]->value < MainNode->childNode[j + 1]->value)
+            {
+                std::swap(MainNode->childNode[j], MainNode->childNode[j + 1]);
+            }
         }
     }
-    POINT ChosenPoint = MainNode->childNode[maxValuePos]->Point;
-
+    for (int i = 0; i < MainNode->childNode.size(); i++)
+    {
+        POINT point = MainNode->childNode[i]->Point;
+        if (Check_Board(point.x, point.y, Board, color) != opposite_Color(color))
+        {
+            deleteNode(MainNode);
+            return point;
+        }
+    }
+    POINT point = MainNode->childNode[0]->Point;
     deleteNode(MainNode);
-    return ChosenPoint;
+    return point;
 }

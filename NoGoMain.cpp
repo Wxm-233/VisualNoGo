@@ -302,7 +302,7 @@ case GAME_INTERFACE:
 							break;
 
 						case CVC_MODE:
-							//TBA
+							//undefined
 							break;
 
 						default: break;

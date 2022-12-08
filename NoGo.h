@@ -54,8 +54,7 @@ void clear_Board(signed char** Board)
 
 void free_Board(signed char** Board)
 {
-    for (int i = 0; i < BOARD_SIZE; i++)
-        free(Board[i]);
+    free(Board[0]);
 
     free(Board);
 }
