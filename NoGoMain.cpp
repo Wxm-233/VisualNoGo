@@ -12,14 +12,6 @@ int main()
 {
 	LoadImages();
 
-	//check if the board is succesfully initialized
-	if (Board == NULL)
-	{
-		MessageBox(MainWnd, TEXT("Failed to initialize Board!"), TEXT("Error!"), MB_OK);
-		closegraph();
-		return 0;
-	}
-
 	while (true)
 		switch (currentInterface)
 		{
@@ -249,7 +241,7 @@ case GAME_INTERFACE:
 			CurrentChosen = NOBUTTON;
 			currentRound = 1;
 			if (PlayerSelected == WHITE_PIECE && SelectedMode == PVC_MODE)
-				AIOperation(MainWnd, Board, MCTS_AI(Board, currentRound));
+				BotOperation(MainWnd, Board, MCTS_AI(Board, currentRound));
 
 			doGameRestart = false;
 
@@ -281,28 +273,25 @@ case GAME_INTERFACE:
 						{
 						case PVP_MODE:
 							dropPosition = pixel2board(m.x, m.y);
-							PlayerOperation(MainWnd, Board);
-							GameJudge();
+							if(PlayerOperation(MainWnd, Board))
+								GameJudge();
 							break;
 
 						case PVC_MODE:
-							if (Round2Color(currentRound) == PlayerSelected)
+							if (Round2Color(currentRound) != PlayerSelected)
+								MessageBox(MainWnd, TEXT("Not your Round!"), TEXT("Waring"), MB_OK);
+
+							dropPosition = pixel2board(m.x, m.y);
+							if (PlayerOperation(MainWnd, Board) && GameJudge() == GAME_ON)
 							{
-								dropPosition = pixel2board(m.x, m.y);
-								if (PlayerOperation(MainWnd, Board))
-								{
-									if (GameJudge() == GAME_ON)
-									{
-										AIOperation(MainWnd, Board, MCTS_AI(Board, currentRound));
-										GameJudge();
-									}
-								}
+								BotOperation(MainWnd, Board, MCTS_AI(Board, currentRound));
+								GameJudge();
 							}
-							else MessageBox(MainWnd, TEXT("Not your Round!"), TEXT("Waring"), MB_OK);
+
 							break;
 
 						case CVC_MODE:
-							//undefined
+							//nothing to do
 							break;
 
 						default: break;
@@ -314,7 +303,7 @@ case GAME_INTERFACE:
 					case NEXT:
 						if (SelectedMode == CVC_MODE)
 						{
-							AIOperation(MainWnd, Board, MCTS_AI(Board, currentRound));
+							BotOperation(MainWnd, Board, MCTS_AI(Board, currentRound));
 							GameJudge();
 						}
 						break;

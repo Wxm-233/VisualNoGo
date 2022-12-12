@@ -30,26 +30,25 @@ signed char     Check_Board(signed char x, signed char y, signed char** Board, s
 
 signed char** noGo_Initialize()
 {
-    signed char** Board = (signed char**)malloc(BOARD_SIZE * sizeof(signed char*));
-    if (Board == NULL)
-        return NULL;
-
-    signed char* Area = (signed char*)malloc(BOARD_SIZE * BOARD_SIZE * sizeof(signed char));
-    if (Area == NULL)
-        return NULL;
+    do {
+        signed char** Board = (signed char**)malloc(BOARD_SIZE * sizeof(signed char*));
+    }while (Board == NULL);
+    
+    do {
+        signed char* Area = (signed char*)malloc(BOARD_SIZE * BOARD_SIZE * sizeof(signed char));
+    }while (Area == NULL);
 
     memset(Area, BLANK, BOARD_SIZE * BOARD_SIZE * sizeof(signed char));
 
     for (int i = 0; i < BOARD_SIZE; i++)
-        Board[i] = Area + i * BOARD_SIZE;
+        Board[i] = Area + i * BOARD_SIZE;//Area[0] Area[9] ... Area[72]
 
     return Board;
-}
+}//Board[x][y]
 
 void clear_Board(signed char** Board)
 {
-    for (int i = 0; i < BOARD_SIZE; i++)
-        memset(Board[i], BLANK, BOARD_SIZE * sizeof(signed char));
+    memset(Board[0], BLANK, BOARD_SIZE * BOARD_SIZE * sizeof(signed char));
 }
 
 void free_Board(signed char** Board)
@@ -87,6 +86,7 @@ signed char board_Process(signed char x, signed char y, signed char** Board, sig
     } while (searchMap == NULL);
 
     memset(searchMap, 0, BOARD_SIZE * sizeof(unsigned int));
+
     if (!qi_Search(x, y, Board, searchMap, color))
     {
         free(searchMap);
@@ -94,6 +94,7 @@ signed char board_Process(signed char x, signed char y, signed char** Board, sig
     }
 
     memset(searchMap, 0, BOARD_SIZE * sizeof(unsigned int));
+
     if (x - 1 >= 0 && Board[x - 1][y] == opposite_Color(color) && !qi_Search(x - 1, y, Board, searchMap, opposite_Color(color)))          
     {
         free(searchMap);
@@ -101,6 +102,7 @@ signed char board_Process(signed char x, signed char y, signed char** Board, sig
     }
 
     memset(searchMap, 0, BOARD_SIZE * sizeof(unsigned int));
+
     if (x + 1 < BOARD_SIZE && Board[x + 1][y] == opposite_Color(color) && !qi_Search(x + 1, y, Board, searchMap, opposite_Color(color)))          
     {
         free(searchMap);
@@ -108,6 +110,7 @@ signed char board_Process(signed char x, signed char y, signed char** Board, sig
     }
 
     memset(searchMap, 0 , BOARD_SIZE * sizeof(unsigned int));
+
     if (y - 1 >= 0 && Board[x][y - 1] == opposite_Color(color) && !qi_Search(x, y - 1, Board, searchMap, opposite_Color(color)))          
     {
         free(searchMap);
@@ -115,6 +118,7 @@ signed char board_Process(signed char x, signed char y, signed char** Board, sig
     }
 
     memset(searchMap, 0, BOARD_SIZE * sizeof(unsigned int));
+
     if (y + 1 < BOARD_SIZE && Board[x][y + 1] == opposite_Color(color) && !qi_Search(x, y + 1, Board, searchMap, opposite_Color(color)))          
     {
         free(searchMap);

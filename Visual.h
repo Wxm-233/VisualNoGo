@@ -333,32 +333,31 @@ bool PlayerOperation(HWND MainWnd, signed char** Board)
 		return false;
 	}
 
-	if (Board[dropPosition.x][dropPosition.y] == BLANK) {
-		currentRound++;
-		putimage(rct_Board.left + dropPosition.x * SIZE_OF_A_CELL - SIZE_OF_PIECE_PIC, rct_Board.top + dropPosition.y * SIZE_OF_A_CELL - SIZE_OF_PIECE_PIC, &img_Under, SRCAND);
+	if (Board[dropPosition.x][dropPosition.y] != BLANK)
+		return false;
 
-		if (!(currentRound % 2))
-		{
-			Board[dropPosition.x][dropPosition.y] = BLACK_PIECE;
-			putimage(rct_Board.left + dropPosition.x * SIZE_OF_A_CELL - SIZE_OF_PIECE_PIC, rct_Board.top + dropPosition.y * SIZE_OF_A_CELL - SIZE_OF_PIECE_PIC, &img_Black, SRCPAINT);
-			putimage(rct_indicator.left, rct_indicator.top, &img_White_Small, SRCCOPY);
-			GameResult = board_Process(dropPosition.x, dropPosition.y, Board, BLACK_PIECE);
-		}
+	currentRound++;
+	putimage(rct_Board.left + dropPosition.x * SIZE_OF_A_CELL - SIZE_OF_PIECE_PIC, rct_Board.top + dropPosition.y * SIZE_OF_A_CELL - SIZE_OF_PIECE_PIC, &img_Under, SRCAND);
 
-		else {
-			Board[dropPosition.x][dropPosition.y] = WHITE_PIECE;
-			putimage(rct_Board.left + dropPosition.x * SIZE_OF_A_CELL - SIZE_OF_PIECE_PIC, rct_Board.top + dropPosition.y * SIZE_OF_A_CELL - SIZE_OF_PIECE_PIC, &img_White, SRCPAINT);
-			putimage(rct_indicator.left, rct_indicator.top, &img_Black_Small, SRCCOPY);
-			GameResult = board_Process(dropPosition.x, dropPosition.y, Board, WHITE_PIECE);
-		}
-
-		return true;
+	if (!(currentRound % 2))
+	{
+		Board[dropPosition.x][dropPosition.y] = BLACK_PIECE;
+		putimage(rct_Board.left + dropPosition.x * SIZE_OF_A_CELL - SIZE_OF_PIECE_PIC, rct_Board.top + dropPosition.y * SIZE_OF_A_CELL - SIZE_OF_PIECE_PIC, &img_Black, SRCPAINT);
+		putimage(rct_indicator.left, rct_indicator.top, &img_White_Small, SRCCOPY);
+		GameResult = board_Process(dropPosition.x, dropPosition.y, Board, BLACK_PIECE);
 	}
 
-	return false;
+	else {
+		Board[dropPosition.x][dropPosition.y] = WHITE_PIECE;
+		putimage(rct_Board.left + dropPosition.x * SIZE_OF_A_CELL - SIZE_OF_PIECE_PIC, rct_Board.top + dropPosition.y * SIZE_OF_A_CELL - SIZE_OF_PIECE_PIC, &img_White, SRCPAINT);
+		putimage(rct_indicator.left, rct_indicator.top, &img_Black_Small, SRCCOPY);
+		GameResult = board_Process(dropPosition.x, dropPosition.y, Board, WHITE_PIECE);
+	}
+
+	return true;
 }
 
-void AIOperation(HWND MainWnd, signed char** Board, POINT AI_Chosen)
+void BotOperation(HWND MainWnd, signed char** Board, POINT AI_Chosen)
 {
 		currentRound++;
 		putimage(rct_Board.left + AI_Chosen.x * SIZE_OF_A_CELL - SIZE_OF_PIECE_PIC, rct_Board.top + AI_Chosen.y * SIZE_OF_A_CELL - SIZE_OF_PIECE_PIC, &img_Under, SRCAND);
